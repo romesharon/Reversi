@@ -17,10 +17,12 @@ public:
     Cell **getArr() const;
     void setBlack(int,int);
     void setWhite(int,int);
+    void setArr(Cell** a);
+    void setCell(int, int, char);
+    int getCount(char);
 private:
     int size;
     Cell** arr;
-
 };
 
 
