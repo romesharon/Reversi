@@ -50,3 +50,27 @@ CellManger::~CellManger() {
     delete [] arr;
 
 }
+
+void CellManger::setArr(Cell** a) {
+    for(int i = 0; i < size+3; i++) {
+        for(int j=0;j<size+3;j++){
+            arr[i][j].symbol= a[i][j].symbol;
+        }
+    }
+}
+
+void CellManger::setCell(int i, int j, char symbol) {
+    this->arr[i][j] = symbol;
+}
+
+int CellManger::getCount(char symbol) {
+    int counter = 0;
+    for (int i = 0; i < size+3; ++i) {
+        for (int j = 0; j < size+3; ++j) {
+            if(arr[i][j].symbol == symbol) {
+                counter++;
+            }
+        }
+    }
+    return counter;
+}
