@@ -17,7 +17,9 @@ class AIPlayer: public Player {
 public:
     Point* oneMove(Point**,int) const;
     char getSymbol() const;
+    CellManger *getC() const;
     AIPlayer(char, CellManger* c);
+    ~AIPlayer();
 private:
     char symbol;
     CellManger* c;

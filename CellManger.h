@@ -20,9 +20,11 @@ public:
     void setArr(Cell** a);
     void setCell(int, int, char);
     int getCount(char);
+    Cell getCell(int,int);
 private:
     int size;
     Cell** arr;
+
 };
 
 

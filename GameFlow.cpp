@@ -70,5 +70,12 @@ void GameFlow::play() {
         delete (points);
     }while(numOfPieces<screen->getSize()*screen->getSize());
 
-    cout<<"game is over count who has the most pieces"<<endl;
+    cout<<"game over"<<endl;
+
+    if(this->manger->getCount('x')>this->manger->getCount('o')){
+        cout<<"player black-x has won"<<endl;
+    }
+    else{
+        cout<<"player white-o has won"<<endl;
+    }
 }

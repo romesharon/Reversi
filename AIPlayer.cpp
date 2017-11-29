@@ -56,8 +56,13 @@ Point* AIPlayer::oneMove(Point ** points, int a) const {
 
         //adding the move we did and the max of the opposite player to map
         moves[points[i]] = max;
+        for(int i=0;i<counter;i++){
+            oppositeMoves[i];
+        }
+        counter = 0;
     }
     //iterating over the moves and chosing the move that will bring the opposite player the lowest max
+
     for (map<Point*, int>::iterator it=moves.begin(); it!=moves.end(); it++) {
         if(it->second < min) {
             min = it->second;
@@ -65,10 +70,13 @@ Point* AIPlayer::oneMove(Point ** points, int a) const {
         }
     }
 
-    for (int k = 1; k <counter; k++) {
-        delete oppositeMoves[k];
-    }
-    delete [] oppositeMoves;
-
+    delete(oppositeMoves);
     return p;
+}
+
+CellManger *AIPlayer::getC() const {
+    return c;
+}
+AIPlayer::~AIPlayer(){
+    delete(this->rule);
 }

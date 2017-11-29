@@ -12,6 +12,7 @@ CellManger::CellManger(int s) {
             arr[i][j].symbol='a';
         }
     }
+
 }
 /*
  * return the size
@@ -73,4 +74,7 @@ int CellManger::getCount(char symbol) {
         }
     }
     return counter;
+}
+Cell CellManger::getCell(int i,int j){
+    return this->arr[i][j];
 }
