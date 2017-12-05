@@ -1,41 +1,30 @@
+/*aviv shisman 206558157
+ *rom sharon 209296235*/
+#include "Server.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
-/*aviv shisman 206558157*/
-#include "Board.h"
-#include "CellManger.h"
-#include "ReverseRule.h"
-#include "Player.h"
-#include "HumanPlayer.h"
-#include "GameFlow.h"
+using namespace std;
 
-/*the main function.
-creating the board and setting pieces.*/
-
-int main()
-{
-    CellManger* c=new CellManger(8);
-    c->setWhite(4,4);
-    c->setWhite(5,5);
-    c->setBlack(4,5);
-    c->setBlack(5,4);
-    Board* b=new Board(8,c->getArr());
-    Rule* r=new ReverseRule();
-    Player* p1=new HumanPlayer('x');
-    Player* p2=new HumanPlayer('o');
-    Player** players=new Player*[2];
-    players[0]=p1;
-    players[1]=p2;
-    GameFlow* g=new GameFlow(b,c,r,players);
-    g->play();
-    b->show();
-
-    delete c;
-    delete b;
-    delete r;
-    delete p1;
-    delete p2;
-    delete[] players;
-    delete g;
-
-
-    return 0;
+int main(int argc, char *argv[]){
+    ifstream settings;
+    string line;
+    int port = 0;
+    if (argc <= 1){
+        cout << "Error settings file did'nt entered" << endl;
+        return 1;
+    }
+    settings.open(argv[1]);
+    if (!settings.is_open()) {
+        cout <<"Error opening settings file" << endl;
+        return 1;
+    }
+    getline (settings,line);
+    stringstream data(line);
+    data >> port;
+    Server server(8000);
+    server.start();
+    settings.close();
 }
+
