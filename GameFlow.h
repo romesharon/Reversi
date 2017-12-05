@@ -1,4 +1,5 @@
-/* aviv shisman 206558157
+/* aviv shisman 206558157 01
+ * rome sharon 209296235 01
  * this class defines the flow of the game
  * the play method uses all the classes to create a full functioning game.
  * explanation on the methods in the cpp file

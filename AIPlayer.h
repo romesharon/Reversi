@@ -1,6 +1,5 @@
-//
-// Created by magshimim on 20/11/17.
-//
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 
 #ifndef ASS1_AIPLAYER_H
 #define ASS1_AIPLAYER_H
@@ -19,11 +18,9 @@ public:
     char getSymbol() const;
     CellManger *getC() const;
     AIPlayer(char, CellManger* c);
-    ~AIPlayer();
 private:
     char symbol;
     CellManger* c;
-    Rule* rule;
 };
 
 

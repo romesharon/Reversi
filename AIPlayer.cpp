@@ -1,13 +1,10 @@
-/*aviv shisman 206558157
- *
- */
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 
 #include "AIPlayer.h"
 AIPlayer::AIPlayer(char s, CellManger* cells){
     this->symbol = s;
     this->c = cells;
-    //free rule
-    this->rule = new ReverseRule();
 }
 
 char AIPlayer::getSymbol() const {
@@ -17,29 +14,33 @@ char AIPlayer::getSymbol() const {
 Point* AIPlayer::oneMove(Point ** points, int a) const {
     map<Point*, int> moves;
     Point* p;
+    ReverseRule rule;
     int row, col, counter = 0, min = c->getSize() * c->getSize();
     int rowSecond, colSecond, max = -c->getSize() * c->getSize();
     char opposite;
-    Point** oppositeMoves = new Point*[c->getSize() * c->getSize()];
     for(int i = 0; i < a; i++) {
         //copy the board.
         CellManger copyCell(c->getSize());
         row = points[i]->getX();
         col = points[i]->getY();
         copyCell.setArr(c->getArr());
+
         //applying the move
         copyCell.setCell(row, col, symbol);
         opposite = copyCell.getArr()[row][col].opposite();
-        rule->apply(copyCell.getArr(), row, col, symbol);
+        rule.apply(copyCell.getArr(), row, col, symbol);
+
         //get opposite player moves
+        Point** oppositeMoves = new Point*[c->getSize() * c->getSize()];
         for (int k = 1; k <= copyCell.getSize(); k++) {
             for (int l = 1; l <= copyCell.getSize(); l++) {
-                if (rule->check(copyCell.getArr(), k, l, opposite) ) {
+                if (rule.check(copyCell.getArr(), k, l, opposite) ) {
                     oppositeMoves[counter] = new Point(k, l);
                     counter++;
                 }
             }
         }
+
         //checking the "max" move for opposite player
         for(int j = 0; j < counter; j++) {
             CellManger copyCellSecond(copyCell.getSize());
@@ -47,7 +48,7 @@ Point* AIPlayer::oneMove(Point ** points, int a) const {
             rowSecond = oppositeMoves[j]->getX();
             colSecond = oppositeMoves[j]->getY();
             copyCellSecond.setCell(rowSecond, colSecond, opposite);
-            rule->apply(copyCellSecond.getArr(), rowSecond, colSecond, opposite);
+            rule.apply(copyCellSecond.getArr(), rowSecond, colSecond, opposite);
             int sub = copyCell.getCount(opposite) - copyCellSecond.getCount(symbol);
             if(max < sub) {
                 max = sub;
@@ -57,26 +58,28 @@ Point* AIPlayer::oneMove(Point ** points, int a) const {
         //adding the move we did and the max of the opposite player to map
         moves[points[i]] = max;
         for(int i=0;i<counter;i++){
-            oppositeMoves[i];
+            delete oppositeMoves[i];
         }
+        delete oppositeMoves;
         counter = 0;
     }
     //iterating over the moves and chosing the move that will bring the opposite player the lowest max
-
+    int flag=0;
     for (map<Point*, int>::iterator it=moves.begin(); it!=moves.end(); it++) {
         if(it->second < min) {
+            if(flag){
+                delete(p);
+            }
             min = it->second;
             p = new Point(*it->first);
+            flag=1;
         }
     }
 
-    delete(oppositeMoves);
     return p;
 }
 
 CellManger *AIPlayer::getC() const {
     return c;
 }
-AIPlayer::~AIPlayer(){
-    delete(this->rule);
-}
+

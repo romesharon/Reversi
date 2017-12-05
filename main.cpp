@@ -1,5 +1,5 @@
-
-/*aviv shisman 206558157*/
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 #include "Board.h"
 #include "CellManger.h"
 #include "ReverseRule.h"
@@ -23,16 +23,24 @@ int main()
     c->setBlack(5,4);
     Board* b=new Board(8,c->getArr());
     Rule* r=new ReverseRule();
-    cout << "Welcome to Reversi!!!!" << endl << "1. 1 vs 1"<< endl << "2. 1 vs Computer" << endl;
+    cout << "Welcome to Reversi!!!!" << endl << "1. 1 vs 1"<< endl << "2. 1 vs Computer" << endl
+         <<"3. play Online"<<endl;
     do {
-        cout << "Enter your choice here";
+        cout << "Enter your choice here"<<endl;
         cin >> choice;
     }while (choice != 1 && choice != 2);\
     Player* p2;
     if(choice == 1) {
         p2 =new HumanPlayer('o');
-    } else {
+    } else if(choice==2) {
         p2 = new AIPlayer('o', c);
+    }
+    else if(choice==3){
+
+
+        //create a client and securing connection
+        //delete the unecassary objects...
+
     }
     Player* p1=new HumanPlayer('x');
 

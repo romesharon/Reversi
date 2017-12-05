@@ -1,4 +1,5 @@
-//aviv shisman 206558157
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "../HumanPlayer.h"
@@ -13,7 +14,6 @@ TEST(HumanPlayerTest,testSymbol){
     EXPECT_FALSE(p1.getSymbol()!='x');
 
 }
-//roie said we cant check the interface with user?
 TEST(HumanPlayert__Test,testOneMove){
     Point** points=new Point*[1];
     points[0]=new Point(1,1);

@@ -1,6 +1,5 @@
-/* aviv shisman 206558157
- * class represent a cell in the board
- */
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 
 #ifndef ASS1_CELL_H
 #define ASS1_CELL_H

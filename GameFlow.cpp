@@ -1,5 +1,5 @@
-/*aviv shisman 206558157
- */
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 
 #include <iostream>
 #include "GameFlow.h"
@@ -39,9 +39,9 @@ void GameFlow::play() {
             }
         }
         if (k == 0) {
-            cout<<"No possible move for:"<<players[current]->getSymbol()<<endl;
+            cout << "No possible move for:" << players[current]->getSymbol() << endl;
             current++;
-            if(current==2){current =0; }
+            if (current == 2) { current = 0; }
             for (int i = 0; i < k; i++) {
                 delete (points[i]);
             }
@@ -56,7 +56,7 @@ void GameFlow::play() {
         }
         numOfPieces++;
         //applying the rule: flipping the appropriate pieces
-        rule->apply(manger->getArr(),a->getX(),a->getY(),players[current]->getSymbol());
+        rule->apply(manger->getArr(), a->getX(), a->getY(), players[current]->getSymbol());
         current++;
 
         if (current == 2) {
@@ -68,6 +68,7 @@ void GameFlow::play() {
             delete (points[i]);
         }
         delete (points);
+    //}while(numOfPieces<10); for debug we will use this somethimes...
     }while(numOfPieces<screen->getSize()*screen->getSize());
 
     cout<<"game over"<<endl;

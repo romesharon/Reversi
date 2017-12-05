@@ -1,7 +1,5 @@
-    //
-
-/*aviv shisman 206558157
-the Board class.*/
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 #pragma once
     #ifndef BOARD_H_
 #define BOARD_H_
