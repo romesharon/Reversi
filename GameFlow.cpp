@@ -1,8 +1,9 @@
-/*aviv shisman 206558157
- */
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 
 #include <iostream>
 #include "GameFlow.h"
+#include "ClientPlayer.h"
 /*
  * the constructor
  * screen - we will use the methods show and size
@@ -19,13 +20,47 @@ GameFlow::GameFlow(GameShower* s, CellManger* c, Rule *r, Player**p) {
     current=0;
     numOfPieces=4;
 }
+
+GameFlow::GameFlow(GameShower *s, CellManger *c, Rule *r, Player** p, Client* cl){
+    screen=s;
+    manger=c;
+    rule=r;
+    players = p;
+    current=0;
+    numOfPieces=4;
+    client = cl;
+}
+
 /*
  * play method uses to start the game
  */
 void GameFlow::play() {
+    bool isOnline = false;
+    bool myTurn=false;
+    if(players[1] == NULL) {
+        isOnline = true;
+        if(players[0]->getSymbol()=='x'){
+            myTurn=true;
+        }
+    }
     do {
         screen->show();
-
+        if (isOnline && !myTurn) {
+            current++;
+            char symbol;
+            Point* p = client->readMove();
+            if (players[0]->getSymbol() == 'x') {
+                manger->setWhite(p->getX(), p->getY());
+                symbol = 'o';
+            } else {
+                manger->setBlack(p->getX(), p->getY());
+                symbol = 'x';
+            }
+            rule->apply(manger->getArr(), p->getX(), p->getY(), symbol);
+            numOfPieces++;
+            myTurn = !myTurn;
+            continue;
+        }
         Point **points = new Point *[screen->getSize() * screen->getSize()];
 
         //going trough all the cells in the array and checking who is valid place to set piece
@@ -39,9 +74,9 @@ void GameFlow::play() {
             }
         }
         if (k == 0) {
-            cout<<"No possible move for:"<<players[current]->getSymbol()<<endl;
+            cout << "No possible move for:" << players[current]->getSymbol() << endl;
             current++;
-            if(current==2){current =0; }
+            if (current == 2) { current = 0; }
             for (int i = 0; i < k; i++) {
                 delete (points[i]);
             }
@@ -56,19 +91,29 @@ void GameFlow::play() {
         }
         numOfPieces++;
         //applying the rule: flipping the appropriate pieces
-        rule->apply(manger->getArr(),a->getX(),a->getY(),players[current]->getSymbol());
+        rule->apply(manger->getArr(), a->getX(), a->getY(), players[current]->getSymbol());
         current++;
 
         if (current == 2) {
             current = 0;
         }
 
+        myTurn = !myTurn;
+
         delete (a);
         for (int i = 0; i < k; i++) {
             delete (points[i]);
         }
         delete (points);
+    //}while(numOfPieces<10); for debug we will use this somethimes...
     }while(numOfPieces<screen->getSize()*screen->getSize());
 
-    cout<<"game is over count who has the most pieces"<<endl;
+    cout<<"game over"<<endl;
+
+    if(this->manger->getCount('x')>this->manger->getCount('o')){
+        cout<<"player black-x has won"<<endl;
+    }
+    else{
+        cout<<"player white-o has won"<<endl;
+    }
 }

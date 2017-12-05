@@ -1,5 +1,5 @@
-/*aviv shisman 206558157
-Board implementation*/
+/*aviv shisman 206558157 01
+rome sharon 209296235 01*/
 #include "Board.h"
 #include <iostream>
 using namespace std;

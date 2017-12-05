@@ -1,4 +1,5 @@
-/*aviv shisman 206558157
+/*aviv shisman 206558157 01
+ *rome sharon 209296235 01
  * interface,objects that will implement him
  * will be treated as a "screen"
  *explanation on the methods in the cpp file

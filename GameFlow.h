@@ -1,4 +1,5 @@
-/* aviv shisman 206558157
+/* aviv shisman 206558157 01
+ * rome sharon 209296235 01
  * this class defines the flow of the game
  * the play method uses all the classes to create a full functioning game.
  * explanation on the methods in the cpp file
@@ -13,11 +14,13 @@
 #include "Rule.h"
 #include "Board.h"
 #include "Player.h"
+#include "Client.h"
 
 class GameFlow {
 public:
     void play();
     GameFlow(GameShower*,CellManger*,Rule*,Player**);
+    GameFlow(GameShower*, CellManger*, Rule*, Player**, Client*);
 private:
     GameShower* screen;
     CellManger* manger;
@@ -25,6 +28,7 @@ private:
     Player** players;
     int current;
     int numOfPieces;
+    Client* client;
 };
 
 
