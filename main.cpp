@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
     getline (settings,line);
     stringstream data(line);
     data >> port;
-    Server server(port);
+    Server server(8000);
     server.start();
     settings.close();
 }
