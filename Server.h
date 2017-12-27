@@ -1,9 +1,9 @@
-//
-// Created by rom on 02/12/17.
-//
+/*aviv shisman 206558157 and rom sharon
+ * the server:
+ */
 
-#ifndef ASS1_SERVER_H
-#define ASS1_SERVER_H
+#ifndef Server_H
+#define Server_H
 
 
 class Server {
@@ -11,13 +11,10 @@ public:
     Server(int port);
     void start();
     void stop();
-
+    static void* handleClient(void*);
 private:
     int port;
     int serverSocket;
-
-    void handleTowClients(int clientSocket1, int clientSocket2);
 };
 
-
-#endif //ASS1_SERVER_H
+#endif

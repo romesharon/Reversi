@@ -1,23 +1,29 @@
-//
-// Created by rom on 02/12/17.
-//
-
-#include"Server.h"
-#include <iostream>
+/*aviv shisman 206558157 and rom sharon
+ * the server:
+ */
+#include "Server.h"
+#include "CommandManeger.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>
-
+#include <pthread.h>
 using namespace std;
 
-#define MAX_CONNECTED_CLIENTS 2
-
+#define MAX_CONNECTED_CLIENTS 6
+/*
+ * constructor
+ */
 Server::Server(int port) : port(port), serverSocket(0){
     cout << "Server" << endl;
 }
-
+/*
+ * initializing the server and start the game
+ */
 void Server::start(){
+    int clientSocket1 = 0;
+    vector<pthread_t>* threads = new vector<pthread_t>();
+    int counter = 0;
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
         throw "Error opening socket";
@@ -26,6 +32,7 @@ void Server::start(){
     struct sockaddr_in serverAddress;
     bzero((void *) &serverAddress, sizeof(serverAddress));
     serverAddress.sin_family = AF_INET;
+    //local host
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     serverAddress.sin_port = htons(port);
     if (bind(serverSocket, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) == -1) {
@@ -37,70 +44,71 @@ void Server::start(){
     // Define the client socket's structures
     struct sockaddr_in clientAddress;
     socklen_t clientAddressLen;
+    int key = 0;
 
     while (true) {
         cout << "Waiting for client connectios..." << endl;
+
         // Accept a new client connection
-        int clientSocket1 = accept(serverSocket, (struct sockaddr *) &clientAddress, &clientAddressLen);
+        clientSocket1 = accept(serverSocket, (struct sockaddr *)
+                &clientAddress, &clientAddressLen);
         cout << "Client connected" << endl;
+        //if accept had an error
         if (clientSocket1 == -1) {
             throw "Error on accept";
         }
-        int clientSocket2 = accept(serverSocket, (struct sockaddr *) &clientAddress, &clientAddressLen);
-        cout << "Client connected" << endl;
-        if (clientSocket2 == -1) {
-            throw "Error on accept";
-        }
-        handleTowClients(clientSocket1, clientSocket2);
-        close(clientSocket1);
-        close(clientSocket2);
+        pthread_t temp;
+        threads->push_back(temp);
+        pthread_create(&threads->at(counter), NULL,handleClient,(void*)&clientSocket1);
+        //the game
+        counter++;
     }
-    close(serverSocket);
+    //closing the server with thread!!
 }
 
-
-bool readFromSocket(int clientSocket, string* data, int size) {
-    int byte = read(clientSocket, data, sizeof(data));
-    if (byte == -1) {
-        cout << "Error reading player move" << endl;
-        return false;
-    }
-    if (byte == 0) {
-        cout <<"Client disconnected" << endl;
-        return false;
-    }
-    return true;
-}
-
-
-void Server::handleTowClients(int clientSocket1, int clientSocket2){
-    string data;
-    while(true) {
-        // Read new move from 1
-        if(readFromSocket(clientSocket1, &data, sizeof(data))) {
-            return;
+void* Server::handleClient(void * client) {
+    //closing the server and clients sockets
+    CommandsManager commandsManager;
+    int clientSocket = *((int*)client);
+    while (true) {
+        int i = 0;
+        vector<char*> *args= new vector<char*>;
+        char buffer[100] = {'\0'};
+        char command[100] = {'\0'};
+        int byte = read(clientSocket, buffer, sizeof(buffer));
+        if (byte == -1) {
+            cout << "Error reading player move" << endl;
+            return NULL;
         }
-        if (!data.compare("End")) {
-            return;
+        if (byte == 0) {
+            cout << "Client disconnected" << endl;
+            return NULL;
         }
-        // Send move to player 2
-        int byte = write(clientSocket2, &data, sizeof(data));
-        if(byte == -1) {
-            cout << "Error writing to player2" << endl;
-            return;
+        int flag = 1;
+        int j = 0;
+        int h = 0;
+        char *param;
+        while (buffer[i] != '\0') {
+            if (flag && buffer[i] != ' ') {
+                command[i] = buffer[i];
+            }
+            if (buffer[i] == ' ') {
+                if (!flag) {
+                    args->push_back(param);
+                }
+                param = new char[100];
+                flag = 0;
+                j = 0;
+                i++;
+                continue;
+            } else if (!flag) {
+                param[j] = buffer[i];
+            }
+            i++;
+            j++;
         }
-        // Read new move from 2
-        if(readFromSocket(clientSocket2, &data, sizeof(data))) {
-            return;
-        }
-        if (!data.compare("End")) {
-            return;
-        }
-        // Send move to player 1
-        byte = write(clientSocket1, &data, sizeof(data));
-        if(byte == -1) {
-            cout << "Error writing to player1" << endl;
-            return;
-        }
+        args->push_back(param);
+        commandsManager.executeCommand(command, args, clientSocket);
+        //close(clientSocket);
     }
 }
