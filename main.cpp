@@ -1,5 +1,5 @@
 /*aviv shisman 206558157
- *rom sharon 209296235*/
+*rom sharon 209296235*/
 #include "Server.h"
 #include <fstream>
 #include <iostream>
@@ -8,6 +8,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
+    //reading the port from file called sSettings
     ifstream settings;
     string line;
     int port = 0;
@@ -23,8 +24,8 @@ int main(int argc, char *argv[]){
     getline (settings,line);
     stringstream data(line);
     data >> port;
-    Server server(8000);
+    //start the server
+    Server server(port);
     server.start();
     settings.close();
 }
-
