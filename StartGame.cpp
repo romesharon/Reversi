@@ -1,20 +1,26 @@
 // aviv shisman and rom sharon .
 #include <map>
+#include <unistd.h>
 #include "StartGame.h"
 StartGame::StartGame(){
 
 }
 
-void StartGame::execute(vector<char *>* args, map<string,int>* moti,int socket) {
-    string str = "";
-    for (int i = 0; i < args->size(); i++) {
-        str += args->at(i);
-        if (i + 1 == args->size()) {
-            continue;
-        }
-        str += " ";
+int StartGame::execute(vector<char *>* args, map<string,GameRoom*>* gameMap,int socket) {
+    char buffer[2];
+    int ok = 1;
+    int wrong = 0;
+    string str = getStringFromVector(args);
+    //game isn't exist
+    if ((*gameMap).find(str) == (*gameMap).end()) {
+        write(socket, &ok ,sizeof(ok));
+        read(socket, buffer, sizeof(buffer));
+        (*gameMap)[str] = new GameRoom(socket);
+        return 1;
     }
-
-    (*moti)[str] = socket;
-    cout << (*moti).size() << endl;
+    else {
+        write(socket, &wrong, sizeof(wrong));
+        read(socket, buffer, sizeof(buffer));
+    }
+    return 0;
 }

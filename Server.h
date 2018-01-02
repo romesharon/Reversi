@@ -6,14 +6,18 @@
 #define Server_H
 
 
+#include <sys/types.h>
+#include <vector>
+
+using namespace std;
+
 class Server {
 public:
     Server(int port);
     void start();
-    void stop();
     static void* handleClient(void*);
-    void handleTowClients(int clientSocket1, int clientSocket2);
-
+    void stop(pthread_t);
+    static void* acceptClients(void*);
 private:
     int port;
     int serverSocket;

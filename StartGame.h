@@ -6,11 +6,11 @@
 #define SERVER_STARTGAME_H
 
 #include "Command.h"
-#include <iostream>
+
 class StartGame: public Command {
 public:
     StartGame();
-    void execute(vector<char *>* args,map<string,int>*, int);
+    int execute(vector<char *>* args,map<string,GameRoom*>*, int);
 };
 
 #endif //SERVER_STARTGAME_H

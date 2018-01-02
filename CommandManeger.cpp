@@ -2,28 +2,37 @@
 // Created by magshimim on 22/12/17.
 //
 
+#include <unistd.h>
 #include "CommandManeger.h"
 #include "StartGame.h"
+#include "JoinGame.h"
+#include "ListGames.h"
 
 CommandsManager::CommandsManager() {
-    commandsMap["start"] = new StartGame();
-    gameMap=gameMap->getInstance();
+commandsMap["start"] = new StartGame();
+commandsMap["join"] = new JoinGame();
+commandsMap["list_games"] = new ListGames();
+gameMap=gameMap->getInstance();
 /*
-    commandsMap["list_games"] = new ListGames();
-    commandsMap["join"] = new Join();
-    commandsMap["play"] = new Play();
-    commandsMap["close"] = new Close();
+commandsMap["play"] = new Play();
+commandsMap["close"] = new Close();
 */
 
-    // Add more commands...
+// Add more commands...
 }
-void CommandsManager::executeCommand(char*
-                                     command, vector<char*>* args, int socket) {
+int CommandsManager::executeCommand(char*
+                                 command, vector<char*>* args, int socket) {
+    int wrong = 0;
     string str(command);
     Command *commandObj = commandsMap[str];
-    map<string,int>* map = gameMap->getGames();
-    commandObj->execute(args,map, socket);
-
+    if (commandObj == NULL) {
+        write(socket, &wrong, sizeof(wrong));
+        read(socket, &wrong, sizeof(wrong));
+        return 0;
+    } else {
+        map<string, GameRoom *> *map = gameMap->getGames();
+        return commandObj->execute(args, map, socket);
+    }
 }
 CommandsManager::~CommandsManager() {
     map<string, Command *>::iterator it;
@@ -32,3 +41,4 @@ CommandsManager::~CommandsManager() {
         delete it->second;
     }
 }
+

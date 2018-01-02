@@ -13,7 +13,7 @@ class CommandsManager {
 public:
     CommandsManager();
     ~CommandsManager();
-    void executeCommand(char* command, vector <char*>*, int);
+    int executeCommand(char* command, vector <char*>*, int);
 private:
     map<string, Command*> commandsMap;
     GameMap* gameMap;

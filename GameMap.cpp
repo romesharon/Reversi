@@ -15,9 +15,9 @@ GameMap* GameMap::getInstance() {
     }
 }
 
-map<string,int>* GameMap::getGames() {
+map<string,GameRoom*>* GameMap::getGames() {
     return games;
 }
 GameMap::GameMap() {
-    games = new map<string,int >();
+    games = new map<string,GameRoom*>();
 }

@@ -8,17 +8,18 @@
 
 #include <map>
 #include <string>
+#include "GameRoom.h"
 using namespace std;
 
 
 class GameMap {
 public:
     static GameMap *getInstance();
-    map<string,int>* getGames();
+    map<string,GameRoom*>* getGames();
 private:
     GameMap();
     static GameMap *instance;
-    map<string,int>* games;
+    map<string,GameRoom*>* games;
 };
 
 

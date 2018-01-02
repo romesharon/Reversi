@@ -3,12 +3,13 @@
  */
 #include "Server.h"
 #include "CommandManeger.h"
-#include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>
+#include "Command.h"
 #include <pthread.h>
+#include "GameMap.h"
 using namespace std;
 
 #define MAX_CONNECTED_CLIENTS 6
@@ -22,8 +23,10 @@ Server::Server(int port) : port(port), serverSocket(0){
  * initializing the server and start the game
  */
 void Server::start(){
+    string temp;
     int clientSocket1 = 0;
     vector<pthread_t>* threads = new vector<pthread_t>();
+    pthread_t serverThread = 0;
     int counter = 0;
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
@@ -47,11 +50,33 @@ void Server::start(){
     socklen_t clientAddressLen;
     int key = 0;
 
+    pthread_create(&serverThread, NULL, acceptClients, (void *)&serverSocket);
+
+    cout << "Enter 'exit' for close the server" << endl;
+    do {
+        cin >> temp;
+        if (temp != "exit") {
+            cout << "wrong command" << endl;
+        }
+    }while (temp != "exit");
+
+    stop(serverThread);
+
+    //closing the server with thread!!
+}
+
+void* Server::acceptClients(void * serverSocket) {
+    vector<pthread_t>* threads = new vector<pthread_t>();
+    int counter = 0;
+    struct sockaddr_in clientAddress;
+    socklen_t clientAddressLen;
+    int clientSocket1 = 0;
+    int server = *((int*)serverSocket);
     while (true) {
         cout << "Waiting for client connectios..." << endl;
 
         // Accept a new client connection
-        clientSocket1 = accept(serverSocket, (struct sockaddr *)
+        clientSocket1 = accept(server, (struct sockaddr *)
                 &clientAddress, &clientAddressLen);
         cout << "Client connected" << endl;
         //if accept had an error
@@ -64,123 +89,64 @@ void Server::start(){
         //the game
         counter++;
     }
-    //closing the server with thread!!
+}
+
+void Server::stop(pthread_t serverThreadId) {
+    pthread_cancel(serverThreadId);
+    close(serverSocket);
+    cout << "Server stopped" << endl;
 }
 
 void* Server::handleClient(void * client) {
     //closing the server and clients sockets
     CommandsManager commandsManager;
-    int i = 0;
-    vector<char*> *args= new vector<char*>;
-    int clientSocket1 = *((int*)client);
-    char buffer[100];
-    char command[100] = {'\0'};
-    int byte = read(clientSocket1, buffer, sizeof(buffer));
-    int flag=1;
-    int j=0;
-    int h = 0;
-    char* param;
-    while(buffer[i] != '\0') {
-        if(flag && buffer[i] != ' ') {
-            command[i]=buffer[i];
+    pthread_mutex_t command_mutex;
+    int clientSocket = *((int*)client);
+    int inGame = 0;
+    vector<char*> *args = NULL;
+    while (!inGame) {
+        int i = 0;
+        args= new vector<char*>;
+        char buffer[100] = {'\0'};
+        char command[100] = {'\0'};
+        int byte = read(clientSocket, buffer, sizeof(buffer));
+        if (byte == -1) {
+            cout << "Error reading player move" << endl;
+            return NULL;
         }
-        if(buffer[i]==' ') {
-            if(!flag) {
-                args->push_back(param);
+        if (byte == 0) {
+            cout << "Client disconnected" << endl;
+            return NULL;
+        }
+        int flag = 1;
+        int j = 0;
+        char *param;
+        while (buffer[i] != '\0') {
+            if (flag && buffer[i] != ' ') {
+                command[i] = buffer[i];
             }
-            param=new char[100];
-            flag=0;
-            j=0;
+            if (buffer[i] == ' ') {
+                if (!flag) {
+                    args->push_back(param);
+                }
+                param = new char[100];
+                flag = 0;
+                j = 0;
+                i++;
+                continue;
+            } else if (!flag) {
+                param[j] = buffer[i];
+            }
             i++;
-            continue;
+            j++;
         }
-        else if (!flag){
-            param[j] = buffer[i];
-        }
-        i++;
-        j++;
+        args->push_back(param);
+        pthread_mutex_lock(&command_mutex);
+        inGame = commandsManager.executeCommand(command, args, clientSocket);
+        pthread_mutex_unlock(&command_mutex);
     }
-    args->push_back(param);
-
-    commandsManager.executeCommand(command, args, clientSocket1);
-    close(clientSocket1);
-}
-
-/*the game itself
- * the loop of the game- getting information and passing it to the other client
- */
-void Server::handleTowClients(int clientSocket1, int clientSocket2){
-
-    while (true) {
-        int x;
-        int y;
-        // Read new move from 1
-        int byte = read(clientSocket1, &x, sizeof(x));
-        if (byte == -1) {
-            cout << "Error reading player move" << endl;
-            return;
-        }
-        if (byte == 0) {
-            cout << "Client disconnected" << endl;
-            return;
-        }
-        byte = read(clientSocket1, &y, sizeof(y));
-        if (byte == -1) {
-            cout << "Error reading player move" << endl;
-            return;
-        }
-        if (byte == 0) {
-            cout << "Client disconnected" << endl;
-            return;
-        }
-        //means game over
-        if(x == -1 && y == -1) {
-            return;
-        }
-        // Send move to player 2
-        byte = write(clientSocket2, &x, sizeof(x));
-        if (byte == -1) {
-            cout << "Error writing to player2" << endl;
-            return;
-        }
-        byte = write(clientSocket2, &y, sizeof(y));
-        if (byte == -1) {
-            cout << "Error writing to player2" << endl;
-            return;
-        }
-        // Read new move from 2
-        byte = read(clientSocket2, &x, sizeof(x));
-        if (byte == -1) {
-            cout << "Error reading player move" << endl;
-            return;
-        }
-        if (byte == 0) {
-            cout << "Client disconnected" << endl;
-            return;
-        }
-        byte = read(clientSocket2, &y, sizeof(y));
-        if (byte == -1) {
-            cout << "Error reading player move" << endl;
-            return;
-        }
-        if (byte == 0) {
-            cout << "Client disconnected" << endl;
-            return;
-        }
-        //game over
-        if(x == -1 && y == -1) {
-            return;
-        }
-        //writing the move to player 2
-        byte = write(clientSocket1, &x, sizeof(x));
-        if (byte == -1) {
-            cout << "Error writing to player2" << endl;
-            return;
-        }
-        byte = write(clientSocket1, &y, sizeof(y));
-        if (byte == -1) {
-            cout << "Error writing to player2" << endl;
-            return;
-        }
-    }
+    string str = Command::getStringFromVector(args);
+    map<string, GameRoom *> *gameMap = GameMap::getInstance()->getGames();
+    while(!(*gameMap)[str]->gameOver());
+    close(clientSocket);
 }
