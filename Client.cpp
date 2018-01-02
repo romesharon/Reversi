@@ -2,6 +2,9 @@
 
 #include "Client.h"
 #include <sstream>
+#include <cstdio>
+#include <string>
+
 using namespace std;
 
 /*client constructor
@@ -11,7 +14,6 @@ Client::Client(const char *sIP, int sPort){
     serverIP = sIP;
     serverPort = sPort;
     clientSocket = 0;
-    cout << "Client constructor" << endl;
 }
 
 void Client::sendMove(int arg1, int arg2){
@@ -25,7 +27,15 @@ void Client::sendMove(int arg1, int arg2){
         throw "Error writing arg1 to socket";
     }
 }
-
+void Client::sentString(const char* str){
+    int n = write(clientSocket,str, strlen(str)+1);
+    if (n == -1) {
+        throw "Error writing arg1 to socket";
+    }
+}
+/*
+ * recive which player are you 'x' or 'o'
+ */
 int Client::recvKey(){
     int key;
     int n = read(clientSocket, &key, sizeof(key));
@@ -48,7 +58,6 @@ Point* Client::readMove(){
         throw "Error reading result from socket";
     }
     return new Point(x, y);
-    //delete point!!!!!
 }
 
 void Client::connectToServer(){
@@ -85,4 +94,45 @@ void Client::connectToServer(){
         throw "Error connecting to server";
     }
     cout << "Connected to server" << endl;
+}
+
+void Client::start() {
+    int result = 0;
+
+    printMenu();
+    getchar();
+    do {
+        string option;
+        char buffer[100] = {'\0'};
+        cout << "Enter you command here: " << endl;
+        getline(std::cin, option);
+        sentString(option.c_str());
+        if (!strcmp("list_games", option.c_str())) {
+            int n = read(clientSocket, buffer, sizeof(buffer));
+            write(clientSocket, "y", sizeof("y"));
+
+            while (buffer[0] != '$') {
+                cout << buffer << endl;
+                int n = read(clientSocket, buffer, sizeof(buffer));
+                write(clientSocket, "y", sizeof("y"));
+
+            }
+        } else {
+            int n = read(clientSocket, &result, sizeof(result));
+            if(!result) {
+                cout << "Error wrong command" << endl;
+            }
+            write(clientSocket, "y", sizeof("y"));
+        }
+    }while (result == 0);
+}
+
+void Client::printMenu() {
+    cout << endl << "Hello player!!!" << endl;
+    cout << "Welcome to the online game space" << endl;
+    cout << "Here some usefull commands 4 you :)" << endl << endl;
+    cout << "start <name> - to start new game called name" << endl;
+    cout << "list_games   - get list of the open games you can join" << endl;
+    cout << "join <name>  - join a player that currently waiting in the room-> name"<<endl;
+    cout << "close <only in game> - in a game you have option of exiting" << endl;
 }

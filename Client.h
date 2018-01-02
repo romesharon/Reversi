@@ -20,12 +20,15 @@ public:
     Client(const char *serverIP, int serverPort);
     void connectToServer();
     void sendMove(int arg1, int arg2);
+    void sentString(const char* str);
     Point* readMove();
     int recvKey();
+    void start();
 private:
     const char *serverIP;
     int serverPort;
     int clientSocket;
+    void printMenu();
 };
 
 

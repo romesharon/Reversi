@@ -36,6 +36,7 @@ GameFlow::GameFlow(GameShower *s, CellManger *c, Rule *r, Player** p, Client* cl
 void GameFlow::play() {
     bool isOnline = false;
     bool myTurn=false;
+    bool endGame = false;
     if(players[1] == NULL) {
         isOnline = true;
         if(players[0]->getSymbol()=='x'){
@@ -50,6 +51,13 @@ void GameFlow::play() {
         if (isOnline && !myTurn) {
             char symbol;
             Point* p = client->readMove();
+            if(p->getY() == -1 && p->getX() == -1) {
+                endGame = true;
+                delete p;
+                cout<<"the other player has quit"<<endl;
+                cout<<"you won"<<endl;
+                break;
+            }
             cout << "The other player move: " << p->getX() << ","<< p->getY() << endl;
             if (players[0]->getSymbol() == 'x') {
                 manger->setWhite(p->getX(), p->getY());
@@ -62,6 +70,7 @@ void GameFlow::play() {
             numOfPieces++;
             myTurn = !myTurn;
             //delete p
+            delete p;
             continue;
         }
         Point **points = new Point *[screen->getSize() * screen->getSize()];
@@ -87,6 +96,12 @@ void GameFlow::play() {
             continue;
         }
         Point *a = players[current]->oneMove(points, k);
+        if(a->getY() == -1 && a->getX() == -1) {
+            endGame = true;
+            delete a;
+            cout<<"you chose to forfit"<<endl<<"you lost"<<endl;
+            break;
+        }
         if (players[current]->getSymbol() == 'x') {
             manger->setBlack(a->getX(), a->getY());
         } else {
@@ -111,19 +126,21 @@ void GameFlow::play() {
             delete (points[i]);
         }
         delete (points);
-    //}while(numOfPieces<8); //for debug we will use this somethimes...
-    }while(numOfPieces<screen->getSize()*screen->getSize());
+    }while(numOfPieces<8); //for debug we will use this somethimes...
+    //}while(numOfPieces<screen->getSize()*screen->getSize());
     cout<<"game over"<<endl;
 
-    if(this->manger->getCount('x')>this->manger->getCount('o')){
-        cout<<"player black-x has won"<<endl;
-    }
-    else{
-        cout<<"player white-o has won"<<endl;
-    }
+    if(!endGame){
+        if(this->manger->getCount('x')>this->manger->getCount('o')){
+            cout<<"player black-x has won"<<endl;
+        }
+        else{
+            cout<<"player white-o has won"<<endl;
+        }
 
-    //end message to the server.
-    if (myTurn) {
-        this->client->sendMove(-1,-1);
+        //end message to the server.
+        if (myTurn) {
+            this->client->sendMove(-1,-1);
+        }
     }
 }

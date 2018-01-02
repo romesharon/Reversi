@@ -1,13 +1,15 @@
-//
-// Created by magshimim on 01/12/17.
-//
+/*aviv shisman and rom sharon
+ * Player of online play
+ */
 
 #ifndef ASS1_CLIENTPLAYER_H
 #define ASS1_CLIENTPLAYER_H
 #include "Player.h"
 #include "CellManger.h"
 #include "Client.h"
-
+/*
+ * comments on the functions in the cpp
+ */
 class ClientPlayer: public Player {
     public:
         Point* oneMove(Point**,int) const;
